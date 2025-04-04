@@ -22,10 +22,10 @@ class BookService:
         return get_object_or_404(Book, slug=slug)
     
     @staticmethod
-    def create_book(form):
+    def create_book(book_instance):
         """Crea un nuevo libro"""
-        book = form.save()
-        return book
+        book_instance.save()
+        return book_instance
     
     @staticmethod
     def update_book(instance, form):
@@ -94,7 +94,9 @@ def book_create(request):
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            BookService.create_book(form)
+            book = form.save(commit=False)
+            book.user = request.user
+            BookService.create_book(book)
             messages.success(request, '¡Libro creado con éxito!')
             return redirect('books:list')
     else:
