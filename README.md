@@ -61,10 +61,10 @@ python manage.py createsuperuser
 
 8. Iniciar el servidor de desarrollo:
 ```bash
-python manage.py runserver
+python manage.py runserver 8800
 ```
 
-9. Acceder a la aplicación: [http://localhost:8000](http://localhost:8000)
+9. Acceder a la aplicación: [http://localhost:8800](http://localhost:8800)
 
 ## Estructura del proyecto
 
@@ -111,7 +111,7 @@ favcontent/
 
 ### Panel de administración
 
-Accede al panel de administración en [http://localhost:8000/admin/](http://localhost:8000/admin/) con las credenciales del superusuario creado anteriormente.
+Accede al panel de administración en [http://localhost:8800/admin/](http://localhost:8800/admin/) con las credenciales del superusuario creado anteriormente.
 
 ### Gestión de contenido
 
