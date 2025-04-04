@@ -1,0 +1,213 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ video.title }} | FavContent{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabecera del video -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'videos:list' %}">Videos</a></li>
+                    <li class="breadcrumb-item active">{{ video.title|truncatechars:30 }}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold mb-1">{{ video.title }}</h1>
+            {% if video.creator %}
+            <p class="lead text-muted mb-2">Por {{ video.creator }}</p>
+            {% endif %}
+            
+            <div class="d-flex align-items-center mb-4 flex-wrap">
+                {% if video.platform %}
+                <span class="badge bg-light text-dark border me-2 mb-2">{{ video.platform.name }}</span>
+                {% endif %}
+                
+                {% if video.category %}
+                <span class="badge bg-light text-dark border me-2 mb-2">{{ video.category.name }}</span>
+                {% endif %}
+                
+                {% if video.duration %}
+                <span class="badge bg-secondary text-white me-2 mb-2">{{ video.duration }}</span>
+                {% endif %}
+                
+                <div class="mb-2">
+                    <span class="text-muted ms-2">
+                        <i class="fas fa-star me-1 text-warning"></i> {{ video.rating }}/5
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-md-0 mt-3">
+            <div class="btn-group" role="group">
+                <a href="{% url 'videos:update' video.slug %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i> Editar
+                </a>
+                <a href="{% url 'videos:delete' video.slug %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-2"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido del video -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Imagen/Thumbnail -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div class="ratio ratio-16x9">
+                        {% if video.thumbnail %}
+                        <img src="{{ video.thumbnail.url }}" class="img-fluid" alt="{{ video.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-video fa-5x text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumen y reseña -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Resumen</h5>
+                    <p class="card-text">{{ video.summary|linebreaks }}</p>
+                    
+                    {% if video.review %}
+                    <hr class="my-4">
+                    <h5 class="card-title mb-3">Mi reseña</h5>
+                    <p class="card-text">{{ video.review|linebreaks }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Fechas -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted d-block">Añadido el:</small>
+                            <p class="mb-0">{{ video.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Última actualización:</small>
+                            <p class="mb-0">{{ video.updated_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar lateral -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <!-- Acciones rápidas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Acciones rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if video.url %}
+                        <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> Ver video original
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'videos:update' video.slug %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i> Editar video
+                        </a>
+                        <a href="{% url 'videos:delete' video.slug %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt me-2"></i> Eliminar video
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalles adicionales -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Detalles</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% if video.platform %}
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Plataforma:</span>
+                                <span>{{ video.platform.name }}</span>
+                            </div>
+                        </li>
+                        {% endif %}
+                        
+                        {% if video.category %}
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Categoría:</span>
+                                <span>{{ video.category.name }}</span>
+                            </div>
+                        </li>
+                        {% endif %}
+                        
+                        {% if video.duration %}
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Duración:</span>
+                                <span>{{ video.duration }}</span>
+                            </div>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Calificación:</span>
+                                <span>
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= video.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Videos relacionados -->
+            {% if related_videos %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Videos relacionados</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for related in related_videos %}
+                        <a href="{% url 'videos:detail' related.slug %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    {% if related.thumbnail %}
+                                    <img src="{{ related.thumbnail.url }}" width="70" height="40" class="rounded" alt="{{ related.title }}">
+                                    {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 70px; height: 40px;">
+                                        <i class="fas fa-video text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">{{ related.title|truncatechars:50 }}</h6>
+                                    <p class="mb-0 small text-muted">{{ related.creator }}</p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

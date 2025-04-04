@@ -1,0 +1,139 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ article.title }} | FavContent{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabecera del artículo -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'articles:list' %}">Artículos</a></li>
+                    <li class="breadcrumb-item active">{{ article.title|truncatechars:30 }}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold mb-1">{{ article.title }}</h1>
+            {% if article.author %}
+            <p class="lead text-muted mb-2">Por {{ article.author }}</p>
+            {% endif %}
+            
+            <div class="d-flex align-items-center mb-4">
+                {% if article.category %}
+                <span class="badge bg-light text-dark border me-2">{{ article.category.name }}</span>
+                {% endif %}
+                
+                {% if article.publication_date %}
+                <span class="text-muted">
+                    <i class="fas fa-calendar-alt me-1"></i> {{ article.publication_date }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-md-0 mt-3">
+            <div class="btn-group" role="group">
+                <a href="{% url 'articles:update' article.slug %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i> Editar
+                </a>
+                <a href="{% url 'articles:delete' article.slug %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-2"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido del artículo -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Resumen y detalles -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Resumen</h5>
+                    <p class="card-text">{{ article.summary|linebreaks }}</p>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row g-3">
+                        {% if article.source %}
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Fuente:</h6>
+                            <p>{{ article.source }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if article.url %}
+                        <div class="col-md-6">
+                            <h6 class="text-muted">URL:</h6>
+                            <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">{{ article.url|truncatechars:40 }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fechas -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted d-block">Añadido el:</small>
+                            <p class="mb-0">{{ article.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Última actualización:</small>
+                            <p class="mb-0">{{ article.updated_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar lateral -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <!-- Acciones rápidas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Acciones rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if article.url %}
+                        <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> Ir al artículo original
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'articles:update' article.slug %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i> Editar artículo
+                        </a>
+                        <a href="{% url 'articles:delete' article.slug %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt me-2"></i> Eliminar artículo
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Más artículos de la misma categoría -->
+            {% if related_articles %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Artículos relacionados</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for related in related_articles %}
+                        <a href="{% url 'articles:detail' related.slug %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ related.title|truncatechars:50 }}</h6>
+                            </div>
+                            <p class="mb-1 small text-muted">{{ related.author }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

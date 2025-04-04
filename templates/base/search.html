@@ -1,0 +1,205 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Búsqueda: {{ query }} | FavContent{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Cabecera de búsqueda -->
+    <div class="mb-5">
+        <h1 class="fw-bold mb-4">
+            <i class="fas fa-search me-2 text-primary"></i> Resultados de búsqueda
+        </h1>
+        
+        <form action="{% url 'search' %}" method="get" class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-primary"></i>
+                            </span>
+                            <input type="text" name="q" class="form-control border-start-0" value="{{ query }}" placeholder="Buscar libros, artículos, videos...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="type" class="form-select">
+                            <option value="all" {% if content_type == 'all' %}selected{% endif %}>Todos los contenidos</option>
+                            <option value="books" {% if content_type == 'books' %}selected{% endif %}>Libros</option>
+                            <option value="articles" {% if content_type == 'articles' %}selected{% endif %}>Artículos</option>
+                            <option value="videos" {% if content_type == 'videos' %}selected{% endif %}>Videos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        {% if query %}
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> 
+            Resultados para <strong>"{{ query }}"</strong>
+            {% if content_type != 'all' %}
+            en <strong>
+                {% if content_type == 'books' %}libros{% elif content_type == 'articles' %}artículos{% else %}videos{% endif %}
+            </strong>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Resultados de la búsqueda -->
+    {% if query %}
+        <!-- Libros -->
+        {% if books %}
+        <section class="mb-5">
+            <h2 class="h4 fw-bold mb-4">
+                <i class="fas fa-book me-2 text-primary"></i> Libros ({{ books|length }})
+            </h2>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for book in books %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="row g-0">
+                            <div class="col-4 border-end">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="{{ book.title }}">
+                                {% else %}
+                                <div class="h-100 bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-book fa-2x text-secondary"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-truncate">{{ book.title }}</h5>
+                                    <p class="card-text text-muted small mb-1">{{ book.author }}</p>
+                                    <p class="card-text small mb-2 text-truncate">{{ book.summary|truncatechars:80 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {% if book.genre %}
+                                            <span class="badge badge-genre">{{ book.genre.name }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <a href="{% url 'books:detail' book.slug %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Artículos -->
+        {% if articles %}
+        <section class="mb-5">
+            <h2 class="h4 fw-bold mb-4">
+                <i class="fas fa-newspaper me-2 text-primary"></i> Artículos ({{ articles|length }})
+            </h2>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for article in articles %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate">{{ article.title }}</h5>
+                            <p class="card-text text-muted small mb-1">{{ article.author }}</p>
+                            <p class="card-text small mb-2 text-truncate">{{ article.summary|truncatechars:100 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if article.category %}
+                                    <span class="badge badge-genre">{{ article.category.name }}</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'articles:detail' article.slug %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white small text-muted">
+                            <i class="fas fa-link me-1"></i> {{ article.source }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Videos -->
+        {% if videos %}
+        <section class="mb-5">
+            <h2 class="h4 fw-bold mb-4">
+                <i class="fas fa-video me-2 text-primary"></i> Videos ({{ videos|length }})
+            </h2>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for video in videos %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="video-thumbnail">
+                            {% if video.thumbnail %}
+                            <img src="{{ video.thumbnail.url }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ video.title }}">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                <i class="fas fa-video fa-2x text-secondary"></i>
+                            </div>
+                            {% endif %}
+                            <div class="video-play-icon">
+                                <i class="fas fa-play-circle fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate">{{ video.title }}</h5>
+                            <p class="card-text text-muted small mb-1">{{ video.creator }}</p>
+                            <p class="card-text small mb-2 text-truncate">{{ video.summary|truncatechars:80 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if video.category %}
+                                    <span class="badge badge-genre">{{ video.category.name }}</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'videos:detail' video.slug %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white small text-muted">
+                            <i class="fas fa-tv me-1"></i> {{ video.platform.name|default:"Plataforma desconocida" }}
+                            {% if video.duration %}
+                            <span class="float-end"><i class="fas fa-clock me-1"></i> {{ video.duration }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Sin resultados -->
+        {% if not books and not articles and not videos %}
+        <div class="text-center py-5">
+            <div class="display-1 text-muted mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h2 class="mb-4">No se encontraron resultados</h2>
+            <p class="lead mb-4">No hay contenido que coincida con tu búsqueda. Intenta con otros términos o categorías.</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i> Volver al Dashboard
+            </a>
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Sin consulta -->
+        <div class="text-center py-5">
+            <div class="display-1 text-muted mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h2 class="mb-4">¿Qué estás buscando?</h2>
+            <p class="lead mb-4">Introduce términos de búsqueda para encontrar contenido en tu biblioteca personal.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

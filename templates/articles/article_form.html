@@ -1,0 +1,178 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ action }} Artículo | FavContent{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabecera del formulario -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'articles:list' %}">Artículos</a></li>
+                    <li class="breadcrumb-item active">{{ action }} artículo</li>
+                </ol>
+            </nav>
+            <h1 class="fw-bold">
+                {% if action == 'Crear' %}
+                <i class="fas fa-plus-circle me-2 text-primary"></i>
+                {% else %}
+                <i class="fas fa-edit me-2 text-primary"></i>
+                {% endif %}
+                {{ action }} artículo
+            </h1>
+            <p class="lead">
+                {% if action == 'Crear' %}
+                Añade un nuevo artículo a tu colección personal
+                {% else %}
+                Actualiza la información de este artículo
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger">
+                                {% for error in form.title.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Autor y Fuente -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.author.id_for_label }}" class="form-label">{{ form.author.label }}</label>
+                                {{ form.author }}
+                                {% if form.author.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.author.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.source.id_for_label }}" class="form-label">{{ form.source.label }}</label>
+                                {{ form.source }}
+                                {% if form.source.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.source.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- URL y Fecha de publicación -->
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.url.id_for_label }}" class="form-label">{{ form.url.label }}</label>
+                                {{ form.url }}
+                                {% if form.url.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.url.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.publication_date.id_for_label }}" class="form-label">{{ form.publication_date.label }}</label>
+                                {{ form.publication_date }}
+                                {% if form.publication_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.publication_date.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                            <div class="text-danger">
+                                {% for error in form.category.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Resumen -->
+                        <div class="mb-4">
+                            <label for="{{ form.summary.id_for_label }}" class="form-label">{{ form.summary.label }}</label>
+                            {{ form.summary }}
+                            {% if form.summary.errors %}
+                            <div class="text-danger">
+                                {% for error in form.summary.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'articles:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if action == 'Crear' %}
+                                <i class="fas fa-plus-circle me-2"></i> Crear artículo
+                                {% else %}
+                                <i class="fas fa-save me-2"></i> Guardar cambios
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Consejos</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Incluye el título completo del artículo.</li>
+                        <li class="mb-2">Especifica el autor original para llevar un mejor registro.</li>
+                        <li class="mb-2">Añade la URL completa para acceder rápidamente al contenido original.</li>
+                        <li class="mb-2">Selecciona una categoría adecuada para organizar mejor tu contenido.</li>
+                        <li>Escribe un resumen conciso pero informativo.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

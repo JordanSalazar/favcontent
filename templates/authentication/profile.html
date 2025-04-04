@@ -1,0 +1,261 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Mi Perfil | FavContent{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Cabecera del perfil -->
+    <div class="profile-header text-center py-5 mb-5">
+        <div class="container">
+            <div class="d-flex justify-content-center mb-3">
+                {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="profile-avatar shadow">
+                {% else %}
+                <div class="profile-avatar bg-light d-flex align-items-center justify-content-center shadow">
+                    <i class="fas fa-user fa-3x text-primary"></i>
+                </div>
+                {% endif %}
+            </div>
+            <h1 class="display-5 fw-bold mb-2">{{ user.get_full_name|default:user.username }}</h1>
+            <p class="lead">Miembro desde {{ user.date_joined|date:"F Y" }}</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <!-- Estadísticas de usuario -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i> Mis Estadísticas
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-4 text-center">
+                            <div class="p-3 bg-light rounded-3">
+                                <h4 class="h2 mb-0 text-primary">{{ books_count }}</h4>
+                                <p class="small text-muted mb-0">Libros</p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="p-3 bg-light rounded-3">
+                                <h4 class="h2 mb-0 text-primary">{{ articles_count }}</h4>
+                                <p class="small text-muted mb-0">Artículos</p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="p-3 bg-light rounded-3">
+                                <h4 class="h2 mb-0 text-primary">{{ videos_count }}</h4>
+                                <p class="small text-muted mb-0">Videos</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Libros</span>
+                            <span class="text-primary">{{ books_percentage }}%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ books_percentage }}%" aria-valuenow="{{ books_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Artículos</span>
+                            <span class="text-primary">{{ articles_percentage }}%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ articles_percentage }}%" aria-valuenow="{{ articles_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Videos</span>
+                            <span class="text-primary">{{ videos_percentage }}%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ videos_percentage }}%" aria-valuenow="{{ videos_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enlaces rápidos -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-link me-2 text-primary"></i> Enlaces Rápidos
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action py-3 px-4">
+                            <i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard
+                        </a>
+                        <a href="{% url 'books:list' %}" class="list-group-item list-group-item-action py-3 px-4">
+                            <i class="fas fa-book me-2 text-primary"></i> Mis Libros
+                        </a>
+                        <a href="{% url 'articles:list' %}" class="list-group-item list-group-item-action py-3 px-4">
+                            <i class="fas fa-newspaper me-2 text-primary"></i> Mis Artículos
+                        </a>
+                        <a href="{% url 'videos:list' %}" class="list-group-item list-group-item-action py-3 px-4">
+                            <i class="fas fa-video me-2 text-primary"></i> Mis Videos
+                        </a>
+                        <a href="{% url 'auth:password_change' %}" class="list-group-item list-group-item-action py-3 px-4">
+                            <i class="fas fa-key me-2 text-primary"></i> Cambiar Contraseña
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Formulario de edición de perfil -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-user-edit me-2 text-primary"></i> Editar Perfil
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ user_form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ user_form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ user_form.username|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ user_form.email|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ profile_form.avatar.id_for_label }}" class="form-label">Foto de perfil</label>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" name="{{ profile_form.avatar.name }}" id="{{ profile_form.avatar.id_for_label }}" data-preview="#avatar-preview">
+                                <label class="input-group-text" for="{{ profile_form.avatar.id_for_label }}">Subir</label>
+                            </div>
+                            {% if user.profile.avatar %}
+                            <div class="d-flex align-items-center mt-2">
+                                <img src="{{ user.profile.avatar.url }}" id="avatar-preview" class="rounded me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="delete_avatar" id="delete_avatar">
+                                    <label class="form-check-label" for="delete_avatar">
+                                        Eliminar foto actual
+                                    </label>
+                                </div>
+                            </div>
+                            {% else %}
+                            <img src="#" id="avatar-preview" class="rounded mt-2" style="max-width: 100px; display: none;">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ profile_form.bio|as_crispy_field }}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Actividad reciente -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-history me-2 text-primary"></i> Actividad Reciente
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% if recent_activities %}
+                            {% for activity in recent_activities %}
+                            <div class="list-group-item py-3 px-4 border-0">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        {% if activity.content_type == 'book' %}
+                                        <div class="bg-light rounded-circle p-2">
+                                            <i class="fas fa-book text-primary"></i>
+                                        </div>
+                                        {% elif activity.content_type == 'article' %}
+                                        <div class="bg-light rounded-circle p-2">
+                                            <i class="fas fa-newspaper text-primary"></i>
+                                        </div>
+                                        {% else %}
+                                        <div class="bg-light rounded-circle p-2">
+                                            <i class="fas fa-video text-primary"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-3">
+                                        <p class="mb-1">{{ activity.message }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i> {{ activity.created_at|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                <p>No hay actividad reciente.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Vista previa de imagen de perfil
+        const avatarInput = document.querySelector('input[type="file"][data-preview]');
+        if (avatarInput) {
+            const previewElement = document.querySelector(avatarInput.dataset.preview);
+            
+            avatarInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewElement.src = e.target.result;
+                        previewElement.style.display = 'block';
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Checkbox para eliminar avatar
+        const deleteAvatarCheckbox = document.getElementById('delete_avatar');
+        if (deleteAvatarCheckbox) {
+            deleteAvatarCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('avatar-preview').style.opacity = '0.3';
+                } else {
+                    document.getElementById('avatar-preview').style.opacity = '1';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

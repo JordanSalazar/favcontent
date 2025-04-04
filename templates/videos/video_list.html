@@ -1,0 +1,134 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Mis Videos | FavContent{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold">
+                <i class="fas fa-video me-2 text-danger"></i> Mis Videos
+            </h1>
+            <p class="lead">Tu colección personal de videos favoritos</p>
+        </div>
+        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+            <a href="{% url 'videos:create' %}" class="btn btn-danger">
+                <i class="fas fa-plus me-2"></i> Añadir Video
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar de filtros -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Filtrar por Categoría</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'videos:list' %}{% if active_platform %}?platform={{ active_platform }}{% endif %}" 
+                           class="list-group-item list-group-item-action {% if not active_category %}active{% endif %}">
+                            Todas las categorías
+                        </a>
+                        {% for category in categories %}
+                        <a href="{% url 'videos:list' %}?category={{ category.slug }}{% if active_platform %}&platform={{ active_platform }}{% endif %}" 
+                           class="list-group-item list-group-item-action {% if active_category == category.slug %}active{% endif %}">
+                            {{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Filtrar por Plataforma</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'videos:list' %}{% if active_category %}?category={{ active_category }}{% endif %}" 
+                           class="list-group-item list-group-item-action {% if not active_platform %}active{% endif %}">
+                            Todas las plataformas
+                        </a>
+                        {% for platform in platforms %}
+                        <a href="{% url 'videos:list' %}?platform={{ platform.slug }}{% if active_category %}&category={{ active_category }}{% endif %}" 
+                           class="list-group-item list-group-item-action {% if active_platform == platform.slug %}active{% endif %}">
+                            {{ platform.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de videos -->
+        <div class="col-md-9">
+            {% if videos %}
+            <div class="row g-4">
+                {% for video in videos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm hover-card h-100">
+                        <div class="position-relative">
+                            <div class="embed-responsive embed-responsive-16by9">
+                                {% if video.thumbnail %}
+                                <img src="{{ video.thumbnail.url }}" class="card-img-top" alt="{{ video.title }}">
+                                {% else %}
+                                <div class="bg-light text-center p-4">
+                                    <i class="fas fa-video fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="position-absolute bottom-0 end-0 p-2">
+                                {% if video.duration %}
+                                <span class="badge bg-dark">{{ video.duration }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ video.title }}</h5>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                {% if video.platform %}
+                                <span class="badge bg-light text-dark border">{{ video.platform.name }}</span>
+                                {% endif %}
+                                
+                                {% if video.category %}
+                                <span class="badge bg-light text-dark border">{{ video.category.name }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <p class="card-text">{{ video.summary|truncatechars:80 }}</p>
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i> 
+                                    {% if video.published_date %}
+                                    {{ video.published_date }}
+                                    {% else %}
+                                    Fecha no disponible
+                                    {% endif %}
+                                </small>
+                                <a href="{% url 'videos:detail' video.slug %}" class="btn btn-sm btn-outline-danger">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-video fa-4x text-muted mb-3"></i>
+                    <h3>No hay videos registrados</h3>
+                    <p class="text-muted mb-4">No has añadido ningún video a tu colección aún.</p>
+                    <a href="{% url 'videos:create' %}" class="btn btn-danger">
+                        <i class="fas fa-plus me-2"></i> Añadir tu primer video
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Mis Artículos | FavContent{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold">
+                <i class="fas fa-newspaper me-2 text-primary"></i> Mis Artículos
+            </h1>
+            <p class="lead">Tu colección personal de artículos interesantes</p>
+        </div>
+        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+            <a href="{% url 'articles:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Añadir Artículo
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar de filtros -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Filtrar por Categoría</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'articles:list' %}" class="list-group-item list-group-item-action {% if not active_category %}active{% endif %}">
+                            Todas las categorías
+                        </a>
+                        {% for category in categories %}
+                        <a href="{% url 'articles:list' %}?category={{ category.slug }}" class="list-group-item list-group-item-action {% if active_category == category.slug %}active{% endif %}">
+                            {{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de artículos -->
+        <div class="col-md-9">
+            {% if articles %}
+            <div class="row g-4">
+                {% for article in articles %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm hover-card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ article.title }}</h5>
+                            <p class="card-text text-muted small mb-2">{{ article.author }} | {{ article.source }}</p>
+                            <p class="card-text">{{ article.summary|truncatechars:150 }}</p>
+                            
+                            {% if article.category %}
+                            <span class="badge bg-light text-dark border mb-3">{{ article.category.name }}</span>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i> 
+                                        {% if article.publication_date %}
+                                        {{ article.publication_date }}
+                                        {% else %}
+                                        Fecha no disponible
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <a href="{% url 'articles:detail' article.slug %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+                    <h3>No hay artículos registrados</h3>
+                    <p class="text-muted mb-4">No has añadido ningún artículo a tu colección aún.</p>
+                    <a href="{% url 'articles:create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> Añadir tu primer artículo
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

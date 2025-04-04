@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Eliminar Video | FavContent{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-warning fa-4x mb-3"></i>
+                        <h2 class="fw-bold">¿Estás seguro?</h2>
+                        <p class="lead text-muted">
+                            Estás a punto de eliminar el video:<br>
+                            <strong>"{{ video.title }}"</strong>
+                        </p>
+                        <p class="mb-0">Esta acción no se puede deshacer.</p>
+                    </div>
+                    
+                    <!-- Información del video -->
+                    <div class="card mb-4 bg-light">
+                        <div class="card-body text-start">
+                            <div class="row mb-2">
+                                <div class="col-md-3 text-muted">Creador:</div>
+                                <div class="col-md-9">{{ video.creator|default:"No especificado" }}</div>
+                            </div>
+                            {% if video.platform %}
+                            <div class="row mb-2">
+                                <div class="col-md-3 text-muted">Plataforma:</div>
+                                <div class="col-md-9">{{ video.platform.name }}</div>
+                            </div>
+                            {% endif %}
+                            {% if video.category %}
+                            <div class="row mb-2">
+                                <div class="col-md-3 text-muted">Categoría:</div>
+                                <div class="col-md-9">{{ video.category.name }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="row mb-2">
+                                <div class="col-md-3 text-muted">Duración:</div>
+                                <div class="col-md-9">{{ video.duration|default:"No especificada" }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 text-muted">Creado el:</div>
+                                <div class="col-md-9">{{ video.created_at|date:"d/m/Y H:i" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario de eliminación -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'videos:detail' video.slug %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash-alt me-2"></i> Eliminar definitivamente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,224 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ action }} Video | FavContent{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabecera del formulario -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'videos:list' %}">Videos</a></li>
+                    <li class="breadcrumb-item active">{{ action }} video</li>
+                </ol>
+            </nav>
+            <h1 class="fw-bold">
+                {% if action == 'Crear' %}
+                <i class="fas fa-plus-circle me-2 text-danger"></i>
+                {% else %}
+                <i class="fas fa-edit me-2 text-danger"></i>
+                {% endif %}
+                {{ action }} video
+            </h1>
+            <p class="lead">
+                {% if action == 'Crear' %}
+                Añade un nuevo video a tu colección personal
+                {% else %}
+                Actualiza la información de este video
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger">
+                                {% for error in form.title.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Creador y Plataforma -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.creator.id_for_label }}" class="form-label">{{ form.creator.label }}</label>
+                                {{ form.creator }}
+                                {% if form.creator.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.creator.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.platform.id_for_label }}" class="form-label">{{ form.platform.label }}</label>
+                                {{ form.platform }}
+                                {% if form.platform.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.platform.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- URL y Duración -->
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.url.id_for_label }}" class="form-label">{{ form.url.label }}</label>
+                                {{ form.url }}
+                                {% if form.url.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.url.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.duration.id_for_label }}" class="form-label">{{ form.duration.label }}</label>
+                                {{ form.duration }}
+                                {% if form.duration.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.duration.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Categoría y Calificación -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.category.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}</label>
+                                {{ form.rating }}
+                                {% if form.rating.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.rating.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Miniatura -->
+                        <div class="mb-3">
+                            <label for="{{ form.thumbnail.id_for_label }}" class="form-label">{{ form.thumbnail.label }}</label>
+                            {{ form.thumbnail }}
+                            {% if form.thumbnail.errors %}
+                            <div class="text-danger">
+                                {% for error in form.thumbnail.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if video.thumbnail %}
+                            <div class="mt-2">
+                                <img src="{{ video.thumbnail.url }}" class="img-thumbnail" style="max-height: 100px;" alt="Miniatura actual">
+                                <small class="d-block text-muted mt-1">Miniatura actual</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Resumen -->
+                        <div class="mb-3">
+                            <label for="{{ form.summary.id_for_label }}" class="form-label">{{ form.summary.label }}</label>
+                            {{ form.summary }}
+                            {% if form.summary.errors %}
+                            <div class="text-danger">
+                                {% for error in form.summary.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Reseña -->
+                        <div class="mb-4">
+                            <label for="{{ form.review.id_for_label }}" class="form-label">{{ form.review.label }}</label>
+                            {{ form.review }}
+                            {% if form.review.errors %}
+                            <div class="text-danger">
+                                {% for error in form.review.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'videos:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                {% if action == 'Crear' %}
+                                <i class="fas fa-plus-circle me-2"></i> Crear video
+                                {% else %}
+                                <i class="fas fa-save me-2"></i> Guardar cambios
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Consejos</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Incluye el título completo del video.</li>
+                        <li class="mb-2">Especifica el creador original para llevar un mejor registro.</li>
+                        <li class="mb-2">Añade la URL completa para acceder rápidamente al contenido original.</li>
+                        <li class="mb-2">Incluye la duración en formato HH:MM:SS para videos largos.</li>
+                        <li class="mb-2">Sube una miniatura representativa del video para identificarlo fácilmente.</li>
+                        <li>Escribe tu reseña personal con tus impresiones sobre el video.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

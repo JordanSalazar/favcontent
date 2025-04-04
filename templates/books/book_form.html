@@ -1,0 +1,152 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ action }} Libro | FavContent{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'books:list' %}">Libros</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }} libro</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h4 mb-0">
+                        {% if action == 'Crear' %}
+                        <i class="fas fa-plus-circle me-2"></i> Nuevo Libro
+                        {% else %}
+                        <i class="fas fa-edit me-2"></i> Editar Libro
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    {{ form.title|as_crispy_field }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.author|as_crispy_field }}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.publication_year|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.isbn|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.genre|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.cover_image.id_for_label }}" class="form-label">{{ form.cover_image.label }}</label>
+                                    <div class="image-upload-container">
+                                        {% if book.cover_image %}
+                                        <img src="{{ book.cover_image.url }}" class="img-preview img-fluid rounded mb-2" alt="Portada actual">
+                                        {% else %}
+                                        <img src="#" class="img-preview img-fluid rounded mb-2" alt="Vista previa de la portada" style="display: none;">
+                                        {% endif %}
+                                        <div class="custom-file-upload">
+                                            {{ form.cover_image }}
+                                        </div>
+                                        <div class="form-text">{{ form.cover_image.help_text }}</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.rating|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.summary|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.review|as_crispy_field }}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'books:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Vista previa de imagen
+        const imageInput = document.querySelector('input[type="file"]');
+        const imagePreview = document.querySelector('.img-preview');
+        
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Autoajuste de altura para textareas
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.style.minHeight = '120px';
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            // Trigger para textareas que ya tienen contenido (edición)
+            textarea.dispatchEvent(new Event('input'));
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .custom-file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+    
+    .image-upload-container {
+        text-align: center;
+        border: 2px dashed var(--border-color);
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        background-color: var(--light-color);
+    }
+    
+    .img-preview {
+        max-height: 200px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %} 
